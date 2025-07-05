@@ -1,4 +1,7 @@
 # RedOS
+
+[![bilibili](https://space.bilibili.com/2065357555)]
+
 一个网页版操作系统
 
 ---
