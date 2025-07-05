@@ -1,7 +1,7 @@
 # RedOS
 
 <div align="center">
-  <img src="[https://raw.githubusercontent.com/shhjtvp/RedOS/0c71a415731cfef715732ad49a599db1cd3fe7db/RedOS/icon/RedOS.svg) width="60%" alt="RedOS" />
+  <img src="https://github.com/shhjtvp/RedOS/blob/main/RedOS/icon/RedOS.svg?raw=true" width="60%" alt="RedOS" />
 </div>
 ---
 [![bilibili](https://img.shields.io/badge/%E4%B8%BB%E9%A1%B5-BiliBili-00A4DB?style=flat&labelColor=444444&logoSize=auto)](https://space.bilibili.com/2065357555/)
