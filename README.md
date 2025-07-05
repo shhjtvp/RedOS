@@ -1,6 +1,6 @@
 # RedOS
 
-[![bilibili](https://img.shields.io/badge/动态-BiliBili-00A4DB?style=flat&labelColor=444444&logoSize=auto)](https://space.bilibili.com/2065357555/)
+[![bilibili](https://img.shields.io/badge/%E4%B8%BB%E9%A1%B5-BiliBili-00A4DB?style=flat&labelColor=444444&logoSize=auto)](https://space.bilibili.com/2065357555/)
 
 一个网页版操作系统
 
