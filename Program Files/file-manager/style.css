@@ -1,0 +1,307 @@
+/* 工具栏，使用主题色 */
+.toolbar {
+    background-color: var(--theme-rgba);
+    transition: background-color 0.3s ease;
+}
+
+#dialogConfirm {
+    background-color: var(--theme-rgba);
+    color: white;
+}
+
+/* 上下文菜单悬停效果 */
+.context-menu li:hover {
+    background-color: var(--theme-rgba);
+    color: white;
+}
+/* 选中效果 */
+.file-item.selected {
+    background-color: color-mix(in srgb, var(--theme-rgba) 20%, white);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.file-manager {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.toolbar {
+    background-color: #ff000060;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.toolbar button {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.toolbar button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.toolbar button i {
+    margin-right: 5px;
+}
+
+.path-display {
+    margin-left: 15px;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.main-content {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #e0e0e0;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.quick-access ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quick-access li {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.quick-access li:hover {
+    background-color: #d0d0d0;
+}
+
+.quick-access li i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.file-list {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-list-header {
+    display: flex;
+    background-color: #ddd;
+    padding: 8px 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+}
+
+.file-list-header div {
+    padding: 0 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.file-list-header div:hover {
+    background-color: #ccc;
+}
+
+.header-name {
+    flex: 0 0 40%;
+}
+
+.header-size {
+    flex: 0 0 15%;
+    text-align: right;
+}
+
+.header-modified {
+    flex: 0 0 25%;
+}
+
+.header-type {
+    flex: 0 0 20%;
+}
+
+.file-list-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.file-item {
+    display: flex;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.file-item:hover {
+    background-color: #f0f0f0;
+}
+
+.file-item.selected {
+    background-color: #d0e0ff;
+}
+
+.file-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-name {
+    flex: 0 0 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    flex: 0 0 15%;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.file-modified {
+    flex: 0 0 25%;
+}
+
+.file-type {
+    flex: 0 0 20%;
+}
+
+.status-bar {
+    background-color: #ddd;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-top: 1px solid #ccc;
+}
+
+.context-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.context-menu li {
+    padding: 5px 20px;
+    cursor: pointer;
+}
+
+.context-menu li:hover {
+    background-color: #f0f0f0;
+}
+
+.context-menu li i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    display: none;
+}
+
+.dialog {
+    background-color: white;
+    border-radius: 5px;
+    min-width: 300px;
+    max-width: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h3 {
+    margin: 0;
+}
+
+.close-dialog {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dialog-content {
+    padding: 15px;
+}
+
+.dialog-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.dialog-footer button {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#dialogCancel {
+    background-color: #f0f0f0;
+}
+
+#dialogConfirm {
+    background-color: #ff000060;
+    color: white;
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedOS Beta v0.0.3 | 设置 | by Red hj</title>
+    <title>设置 v0.0.2</title>
     <link rel="shortcut icon" href="setting-icon.svg">
     <style>
         body {
@@ -20,6 +20,9 @@
             background-color: #ffffff;
             border: 1px solid #ffffff;
             border-radius: 5px;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
         }
 
         .settings-container {
@@ -29,6 +32,44 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 分页标签样式 */
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .settings-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .settings-tab:hover {
+            background-color: #e9e9e9;
+        }
+
+        .settings-tab.active {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .settings-content {
+            display: none;
+        }
+
+        .settings-content.active {
+            display: block;
         }
 
         .settings-section {
@@ -53,48 +94,159 @@
             border-radius: 4px;
         }
 
-        .settings-section button {
+        /* 通用按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 10px 15px;
             background-color: #ff000060;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
         }
 
-        .settings-section button:hover {
+        .btn:hover {
             background-color: #ff000080;
+        }
+
+        .btn i {
+            margin-right: 8px;
         }
 
         p {
             margin-top: 5px;
         }
+
+        :root {
+            --theme-color: #ff0000;
+            --theme-rgba: rgba(255, 0, 0, 0.6);
+            --theme-rgba-solid: rgba(255, 0, 0, 1);
+        }
+
+        .window-header {
+            background-color: var(--theme-rgba);
+            transition: background-color 0.3s;
+        }
+
+        .start-menu-header {
+            background: linear-gradient(to right, var(--theme-color), var(--theme-rgba));
+            transition: background 0.3s;
+        }
     </style>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="head-01"><h1>设置 v0.0.1 for RedOS Beta v0.0.3</h1></div>
     <div class="settings-container">
-        <div class="settings-section">
-            <h2>壁纸设置</h2>
-            <label for="background-url">壁纸图片URL：</label>
-            <input type="text" id="background-url" placeholder="请输入图片的URL地址">
-            <label for="background-file">或选择本地图片：</label>
-            <input type="file" id="background-file" accept="image/*">
-            <button onclick="changeBackground()">更改后请刷新页面</button>
+        <div class="settings-tabs">
+            <div class="settings-tab active" data-tab="appearance">外观设置</div>
+            <div class="settings-tab" data-tab="system">系统设置</div>
+            <div class="settings-tab" data-tab="about">关于</div>
+        </div>
+
+        <!-- 外观设置 -->
+        <div id="appearance-settings" class="settings-content active">
+            <div class="settings-section">
+                <h2>壁纸设置</h2>
+                <label for="background-url">壁纸图片URL：</label>
+                <input type="text" id="background-url" placeholder="请输入图片的URL地址">
+                <label for="background-file">或选择本地图片：</label>
+                <input type="file" id="background-file" accept="image/*">
+                <button class="btn" onclick="changeBackground()">
+                    <i class="fas fa-sync-alt"></i>更改壁纸
+                </button>
+            </div>
+        
+            <div class="settings-section">
+                <h2>主题颜色</h2>
+                <label for="theme-color">选择主题颜色：</label>
+                <input type="color" id="theme-color" value="#ff0000">
+                <button class="btn" onclick="saveThemeColor()">
+                    <i class="fas fa-palette"></i>应用主题
+                </button>
+            </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div id="system-settings" class="settings-content">
+            <div class="settings-section">
+                <h2>系统信息</h2>
+                <p><b>操作系统：</b>RedOS</p>
+                <p><b>版本：</b>Beta v0.1.1</p>
+                <p><b>内存使用：</b><span id="memory-usage">加载中...</span></p>
+            </div>
+            
+            <div class="settings-section">
+                <h2>更新</h2>
+                <p>检查系统更新</p>
+                <button class="btn" onclick="checkForUpdates()">
+                    <i class="fas fa-sync"></i>检查更新
+                </button>
+            </div>
+        </div>
+
+        <!-- 关于 -->
+        <div id="about-settings" class="settings-content">
+            <div class="settings-section">
+                <h2>关于</h2>
+                <p>一个基于Web的开源操作系统</p><br>
+                <p><b>作者：</b>红蘑菇hj@bilibili.com</p><br>
+                <p><b>版本：</b>RedOS Beta v0.0.7</p><br>
+                <p><b>项目地址：</b><a href="https://github.com/shhjtvp/RedOS" target="_blank">RedOS</a></p><br>
+                <p><b>开源协议：</b><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></p><br>
+            </div>
         </div>
     </div>
-    <div class="settings-container">
-        <div class="settings-section">
-            <h2>关于</h2>
-            <p><b>作者：</b>红蘑菇hj@bilibili.com</p><br>
-            <p><b>开源信息：</b><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></p><br>
-            <p><b>版本：</b>RedOS Beta v0.0.3</p>
-        </div>
-    </div>
-
-
 
     <script>
+        // 按钮定义
+        class ButtonHelper {
+            static create({icon, text, href, onClick, className = ''}) {
+                const element = document.createElement(href ? 'a' : 'button');
+                element.className = `btn ${className}`;
+                
+                if (icon) {
+                    const iconElem = document.createElement('i');
+                    iconElem.className = icon.startsWith('fa-') ? `fas ${icon}` : icon;
+                    element.appendChild(iconElem);
+                }
+                
+                if (text) {
+                    element.appendChild(document.createTextNode(` ${text}`));
+                }
+                
+                if (href) {
+                    element.href = href;
+                    element.target = '_blank';
+                }
+                
+                if (onClick) {
+                    element.addEventListener('click', onClick);
+                }
+                
+                return element;
+            }
+        }
+
+        // 分页切换功能
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签和内容的active类
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.settings-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加active类到当前标签和对应内容
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-settings`).classList.add('active');
+            });
+        });
+
         function changeBackground() {
             const backgroundUrlInput = document.getElementById('background-url');
             const backgroundFileInput = document.getElementById('background-file');
@@ -122,13 +274,130 @@
             }
         }
 
-        // 加载本地存储的背景设置
+        function saveThemeColor() {
+            const color = document.getElementById('theme-color').value;
+            
+            // 发送给主页面主题颜色
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'themeChange',
+                    color: color
+                }, '*');
+            }
+            
+            // 本地存储
+            localStorage.setItem('themeColor', color);
+            
+            // 本地预览效果
+            applyThemeColor(color);
+            alert('主题颜色已保存！');
+        }
+
+        function applyThemeColor(color) {
+            const rgb = hexToRgb(color);
+            const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            
+            // 应用颜色到当前设置页面
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.style.backgroundColor = rgba;
+                btn.style.transition = 'background-color 0.3s';
+            });
+            
+            document.querySelectorAll('.settings-tab.active').forEach(tab => {
+                tab.style.color = color;
+                tab.style.transition = 'color 0.3s';
+            });
+        }
+
+        function checkForUpdates() {
+            alert('正在检查更新...');
+        }
+
+        function applyThemeColor(color) {
+            // 将颜色转换为RGBA
+            const rgb = hexToRgb(color);
+            const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            const rgbaSolid = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+            
+            // 应用颜色到当前设置页面
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.style.backgroundColor = rgba;
+            });
+            
+            document.querySelectorAll('.settings-tab.active').forEach(tab => {
+                tab.style.color = color;
+            });
+        }
+
+        // 辅助函数：十六进制颜色转RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 255, g: 0, b: 0}; // 默认红色
+        }
+
+        const ThemeManager = {
+            init: function() {
+                // 从本地存储加载主题颜色
+                const savedColor = localStorage.getItem('themeColor') || '#ff0000';
+                this.applyTheme(savedColor);
+                
+                // 监听来自设置页面的主题更改消息
+                window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'themeChange') {
+                        this.applyTheme(event.data.color);
+                    }
+                });
+            },
+            
+            applyTheme: function(color) {
+                const rgb = this.hexToRgb(color);
+                const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+                const rgbaSolid = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+                
+                // 应用主题到系统元素
+                document.querySelectorAll('.window-header').forEach(header => {
+                    header.style.backgroundColor = rgba;
+                });
+                
+                document.querySelectorAll('.start-menu-header').forEach(header => {
+                    header.style.background = `linear-gradient(to right, ${color}, ${rgba})`;
+                });
+                
+                localStorage.setItem('themeColor', color);
+            },
+            
+            hexToRgb: function(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : {r: 255, g: 0, b: 0};
+            }
+        };
+
+
+
+        // 加载本地存储的设置
         window.onload = function() {
             const backgroundUrl = localStorage.getItem('backgroundUrl');
             if (backgroundUrl) {
                 document.getElementById('background-url').value = backgroundUrl;
             }
-        };
+            
+            const themeColor = localStorage.getItem('themeColor') || '#ff0000';
+            document.getElementById('theme-color').value = themeColor;
+            
+            // 模拟内存使用
+            setTimeout(() => {
+                document.getElementById('memory-usage').textContent = 
+                    `${Math.floor(Math.random() * 30) + 10}% (${Math.floor(Math.random() * 500) + 200}MB / 4GB)`;
+            }, 1000);
+        }
     </script>
 </body>
 </html>

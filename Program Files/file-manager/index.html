@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件管理器v0.0.1</title>
+    <link rel="shortcut icon" href="../../icon/RedOS.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="script.js"></script>
+    <style>
+        :root {
+            --theme-color: #ff0000; /* 默认红色 */
+            --theme-rgba: rgba(255, 0, 0, 0.6);
+            --theme-rgba-solid: rgba(255, 0, 0, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="file-manager">
+        <div class="toolbar">
+            <button id="backBtn" title="返回"><i class="fas fa-arrow-left"></i></button>
+            <button id="forwardBtn" title="前进"><i class="fas fa-arrow-right"></i></button>
+            <button id="upBtn" title="上一级"><i class="fas fa-level-up-alt"></i></button>
+            <button id="refreshBtn" title="刷新"><i class="fas fa-sync-alt"></i></button>
+            <button id="newFolderBtn" title="新建文件夹"><i class="fas fa-folder-plus"></i></button>
+            <button id="uploadBtn" title="上传文件"><i class="fas fa-upload"></i></button>
+            <input type="file" id="fileUpload" style="display: none;" multiple>
+            <span id="currentPath" class="path-display">/</span>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="quick-access">
+                    <h3>快速访问</h3>
+                    <ul>
+                        <li data-path=""><i class="fas fa-home"></i> 主目录</li>
+                        <li data-path="Desktop"><i class="fas fa-desktop"></i> 桌面</li>
+                        <li data-path="Documents"><i class="fas fa-file-alt"></i> 文档</li>
+                        <li data-path="Downloads"><i class="fas fa-download"></i> 下载</li>
+                        <li data-path="Pictures"><i class="fas fa-image"></i> 图片</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="file-list">
+                <div class="file-list-header">
+                    <div class="header-name" data-sort="name">名称</div>
+                    <div class="header-size" data-sort="size">大小</div>
+                    <div class="header-modified" data-sort="modified">修改日期</div>
+                    <div class="header-type" data-sort="type">类型</div>
+                </div>
+                <div id="fileListContent" class="file-list-content"></div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="statusInfo">0个项目</span>
+        </div>
+    </div>
+
+    <!-- 上下文菜单 -->
+    <div id="contextMenu" class="context-menu">
+        <ul>
+            <li id="openFile"><i class="fas fa-folder-open"></i> 打开</li>
+            <li id="renameFile"><i class="fas fa-edit"></i> 重命名</li>
+            <li id="copyFile"><i class="fas fa-copy"></i> 复制</li>
+            <li id="pasteFile"><i class="fas fa-paste"></i> 粘贴</li>
+            <li id="deleteFile"><i class="fas fa-trash"></i> 删除</li>
+            <li id="cutFile"><i class="fas fa-cut"></i> 剪切</li>
+            <li id="downloadFile"><i class="fas fa-download"></i> 下载</li>
+            <li id="propertiesFile"><i class="fas fa-info-circle"></i> 属性</li>
+        </ul>
+    </div>
+
+    <!-- 对话框 -->
+    <div id="dialogOverlay" class="dialog-overlay">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3 id="dialogTitle">对话框</h3>
+                <button class="close-dialog">&times;</button>
+            </div>
+            <div class="dialog-content">
+                <div id="dialogMessage"></div>
+                <input type="text" id="dialogInput" style="display: none;">
+            </div>
+            <div class="dialog-footer">
+                <button id="dialogCancel">取消</button>
+                <button id="dialogConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题管理
+        function applyTheme(color) {
+            const rgb = hexToRgb(color);
+            const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            const rgbaSolid = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+            
+            document.documentElement.style.setProperty('--theme-color', color);
+            document.documentElement.style.setProperty('--theme-rgba', rgba);
+            document.documentElement.style.setProperty('--theme-rgba-solid', rgbaSolid);
+            
+            // 直接更新工具栏颜色
+            document.querySelector('.toolbar').style.backgroundColor = rgba;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 255, g: 0, b: 0};
+        }
+
+        // 初始化主题
+        function initTheme() {
+            const savedColor = localStorage.getItem('themeColor') || '#ff0000';
+            applyTheme(savedColor);
+            
+            // 监听主题变化
+            window.addEventListener('message', (event) => {
+                if (event.data?.type === 'themeChange') {
+                    applyTheme(event.data.color);
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initTheme);
+    </script>
+</body>
+</html>

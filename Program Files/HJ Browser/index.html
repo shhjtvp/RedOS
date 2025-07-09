@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedOS Beta v0.0.3 | HJ Browser v0.0.1</title>
+    <title>HJ Browser v0.0.1</title>
     <link rel="shortcut icon" href="browser-icon.png">
     <style>
         * {
@@ -16,8 +16,8 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: 100%; /* 添加高度设置 */
-            width: 100%; /* 添加宽度设置 */
+            height: 100%; 
+            width: 100%; 
         }
 
         .browser-container {
@@ -62,7 +62,7 @@
             border-radius: 4px;
             overflow: hidden;
             display: flex;
-            min-height: 0; /* 添加这个以解决flex容器中的最小高度问题 */
+            min-height: 0; /* 解决flex容器中的最小高度问题 */
         }
 
         iframe {
@@ -76,7 +76,7 @@
 <body>
     <div class="browser-container">
         <div class="browser-header">
-            <span>HJ Browser v0.0.1 for RedOS Beta v0.0.3</span>
+            <span>HJ Browser v0.0.1</span>
             <button onclick="closeBrowser()">关闭</button>
         </div>
         <div class="browser-address-bar">
@@ -85,7 +85,7 @@
                 <option value="https://www.bing.com/search?q=" selected>Bing</option>
                 <option value="https://www.google.com/search?q=">Google</option>
                 <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-                <option value="https://www.baidu.com">BaiDu</option>
+                <option value="https://www.baidu.com/">BaiDu</option>
                 <option value="https://www.sogou.com/">SoGou</option>
                 <option value="https://www.so.com/?src=so.com">360</option>
             </select>
@@ -114,7 +114,7 @@
                 const query = addressBar.value.trim();
                 if (query) {
                     const selectedEngine = searchEngineSelect.value;
-                    if (query.startsWith('http://') || query.startsWith('https://')) {
+                    if (query.startsWith('http://') || query.startsWith('https://') || query.startsWith('www.')) {
                         iframe.src = query; // 网址直接加载
                     } else {
                         iframe.src = selectedEngine + encodeURIComponent(query); // 词用搜索引擎

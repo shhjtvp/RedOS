@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科学计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffffff60;
+            margin: 0;
+        }
+        
+        .calculator {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 320px;
+        }
+        
+        .display {
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: right;
+            font-size: 24px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .history {
+            font-size: 14px;
+            color: #666;
+            height: 18px;
+            overflow: hidden;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+        }
+        
+        button {
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        .number {
+            background-color: #666;
+            color: white;
+        }
+        
+        .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+        
+        .function {
+            background-color: #505050;
+            color: white;
+        }
+        
+        .equals {
+            background-color: #ff9500;
+            color: white;
+            grid-column: span 2;
+        }
+        
+        .clear {
+            background-color: #a5a5a5;
+        }
+        
+        .memory {
+            background-color: #505050;
+            color: white;
+        }
+
+        /* 主题颜色 */
+        :root {
+            --theme-color: #ff0000;
+            --theme-rgba: rgba(255, 0, 0, 0.6);
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffffff60;
+            margin: 0;
+        }
+        
+        .calculator {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            border: 2px solid var(--theme-rgba); /* 新增：使用主题颜色边框 */
+        }
+        
+        .display {
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: right;
+            font-size: 24px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--theme-rgba); /* 新增：使用主题颜色边框 */
+        }
+        
+        .operator, .equals {
+            background-color: var(--theme-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="history" id="history"></div>
+            <div id="display">0</div>
+        </div>
+        <div class="buttons">
+            <button class="function" onclick="addToDisplay('Math.sin(')">sin</button>
+            <button class="function" onclick="addToDisplay('Math.cos(')">cos</button>
+            <button class="function" onclick="addToDisplay('Math.tan(')">tan</button>
+            <button class="function" onclick="addToDisplay('Math.log(')">ln</button>
+            <button class="function" onclick="addToDisplay('Math.log10(')">log</button>
+            
+            <button class="function" onclick="addToDisplay('Math.asin(')">sin⁻¹</button>
+            <button class="function" onclick="addToDisplay('Math.acos(')">cos⁻¹</button>
+            <button class="function" onclick="addToDisplay('Math.atan(')">tan⁻¹</button>
+            <button class="function" onclick="addToDisplay('Math.sqrt(')">√</button>
+            <button class="function" onclick="addToDisplay('Math.pow(')">x^y</button>
+            
+            <button class="memory" onclick="memoryRecall()">MR</button>
+            <button class="memory" onclick="memoryClear()">MC</button>
+            <button class="memory" onclick="memoryAdd()">M+</button>
+            <button class="memory" onclick="memorySubtract()">M-</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
+            
+            <button class="number" onclick="addToDisplay('7')">7</button>
+            <button class="number" onclick="addToDisplay('8')">8</button>
+            <button class="number" onclick="addToDisplay('9')">9</button>
+            <button class="operator" onclick="addToDisplay('/')">/</button>
+            <button class="function" onclick="addToDisplay('Math.PI')">π</button>
+            
+            <button class="number" onclick="addToDisplay('4')">4</button>
+            <button class="number" onclick="addToDisplay('5')">5</button>
+            <button class="number" onclick="addToDisplay('6')">6</button>
+            <button class="operator" onclick="addToDisplay('*')">×</button>
+            <button class="function" onclick="addToDisplay('Math.exp(')">e^x</button>
+            
+            <button class="number" onclick="addToDisplay('1')">1</button>
+            <button class="number" onclick="addToDisplay('2')">2</button>
+            <button class="number" onclick="addToDisplay('3')">3</button>
+            <button class="operator" onclick="addToDisplay('-')">-</button>
+            <button class="function" onclick="addToDisplay('(')">(</button>
+            
+            <button class="number" onclick="addToDisplay('0')">0</button>
+            <button class="number" onclick="addToDisplay('.')">.</button>
+            <button class="operator" onclick="calculate()">=</button>
+            <button class="operator" onclick="addToDisplay('+')">+</button>
+            <button class="function" onclick="addToDisplay(')')">)</button>
+        </div>
+    </div>
+
+    <script>
+        // 主题颜色
+        function applyTheme(color) {
+            const root = document.documentElement;
+            const rgb = hexToRgb(color);
+            const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            
+            root.style.setProperty('--theme-color', color);
+            root.style.setProperty('--theme-rgba', rgba);
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 255, g: 0, b: 0};
+        }
+
+        // 初始化主题
+        function initTheme() {
+            const savedColor = localStorage.getItem('themeColor') || '#ff0000';
+            applyTheme(savedColor);
+            
+            // 监听主题变化
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'themeChange') {
+                    applyTheme(event.data.color);
+                }
+            });
+        }
+
+        // 在页面加载时初始化主题
+        window.addEventListener('DOMContentLoaded', initTheme);
+
+// 计算器功能
+        let currentDisplay = '0';
+        let memoryValue = 0;
+        const displayElement = document.getElementById('display');
+        const historyElement = document.getElementById('history');
+        
+        function updateDisplay() {
+            displayElement.textContent = currentDisplay;
+        }
+        
+        function addToDisplay(value) {
+            if (currentDisplay === '0' && value !== '.') {
+                currentDisplay = value;
+            } else {
+                currentDisplay += value;
+            }
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            currentDisplay = '0';
+            historyElement.textContent = '';
+            updateDisplay();
+        }
+        
+        function calculate() {
+            try {
+                const expression = currentDisplay;
+                // 替换显示用的符号为JavaScript可计算的符号
+                let calcExpression = expression.replace(/×/g, '*').replace(/÷/g, '/');
+                // 处理百分比
+                calcExpression = calcExpression.replace(/(\d+)%/g, '($1/100)');
+                
+                const result = eval(calcExpression);
+                historyElement.textContent = expression + ' =';
+                currentDisplay = result.toString();
+                updateDisplay();
+            } catch (error) {
+                currentDisplay = '错误';
+                updateDisplay();
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+        
+        // 记忆功能
+        function memoryAdd() {
+            try {
+                memoryValue += parseFloat(currentDisplay);
+            } catch (e) {
+                memoryValue = 0;
+            }
+        }
+        
+        function memorySubtract() {
+            try {
+                memoryValue -= parseFloat(currentDisplay);
+            } catch (e) {
+                memoryValue = 0;
+            }
+        }
+        
+        function memoryRecall() {
+            currentDisplay = memoryValue.toString();
+            updateDisplay();
+        }
+        
+        function memoryClear() {
+            memoryValue = 0;
+        }
+        
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html>
