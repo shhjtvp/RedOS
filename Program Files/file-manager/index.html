@@ -14,6 +14,23 @@
             --theme-rgba: rgba(255, 0, 0, 0.6);
             --theme-rgba-solid: rgba(255, 0, 0, 1);
         }
+
+        /* 统一使用主题色 */
+        .dialog-header {
+            background: linear-gradient(to right, var(--theme-color), var(--theme-rgba));
+        }
+
+        .file-list-header {
+            background-color: color-mix(in srgb, var(--theme-rgba) 10%, white);
+        }
+
+        .status-bar {
+            background-color: color-mix(in srgb, var(--theme-rgba) 15%, white);
+        }
+
+        .context-menu {
+            border: 1px solid var(--theme-rgba);
+        }
     </style>
 </head>
 <body>

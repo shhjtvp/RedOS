@@ -4,7 +4,7 @@ class FileManager {
         this.history = [];
         this.historyIndex = -1;
         this.clipboard = null;
-        this.clipboardAction = null; // 'copy' or 'cut'
+        this.clipboardAction = null; 
         
         this.initElements();
         this.initEvents();
@@ -39,6 +39,16 @@ class FileManager {
             propertiesFile: document.getElementById('propertiesFile'),
             quickAccessItems: document.querySelectorAll('.quick-access li')
         };
+    }
+    updateThemeElements() {
+        const color = getComputedStyle(document.documentElement)
+            .getPropertyValue('--theme-color').trim();
+        
+        // 更新所有动态创建的元素
+        document.querySelectorAll('.dialog-header').forEach(header => {
+            header.style.background = `linear-gradient(to right, ${color}, 
+                ${color.replace(')', ', 0.6)')}`;
+        });
     }
     
     initEvents() {
@@ -182,29 +192,37 @@ class FileManager {
     }
     
     // 文件操作
-    listFiles(path) {
-        const mockFiles = this.getMockFiles(path);
-        
-        this.elements.fileListContent.innerHTML = '';
-        
-        if (path) {
-            // 添加".."目录
-            const parentItem = this.createFileItem({
-                name: '..',
-                type: 'directory',
-                size: '',
-                modified: ''
+    async listFiles(path) {
+        try {
+            const response = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
+            const files = await response.json();
+            
+            this.elements.fileListContent.innerHTML = '';
+            files.forEach(file => {
+                this.elements.fileListContent.appendChild(
+                    this.createFileItem({
+                        name: file.name,
+                        type: file.isDirectory ? 'directory' : 'file',
+                        size: file.size ? this.formatFileSize(file.size) : '',
+                        modified: file.modified || ''
+                    })
+                );
             });
-            this.elements.fileListContent.appendChild(parentItem);
+        } catch (error) {
+            this.showError("加载文件列表失败");
         }
-        
-        mockFiles.forEach(file => {
-            const fileItem = this.createFileItem(file);
-            this.elements.fileListContent.appendChild(fileItem);
-        });
-        
-        this.elements.statusInfo.textContent = `${mockFiles.length}个项目`;
     }
+
+    // 文件操作API
+    async deleteFile(path) {
+        const response = await fetch(`/api/files`, {
+            method: 'DELETE',
+            body: JSON.stringify({ path })
+        });
+        return response.ok;
+    }
+        
+        
     
     createFileItem(file) {
         const item = document.createElement('div');

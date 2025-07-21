@@ -43,6 +43,7 @@ const appConfig = [
 // 窗口管理
 const WindowManager = {
     windows: {},
+    taskbarItems: {}, // ✅ 初始化任务栏按钮管理对象
     zIndex: 1001,
     
     create: function(src, title) {
@@ -52,7 +53,6 @@ const WindowManager = {
         draggableWindow.className = 'draggable-window window-open-animation';
         draggableWindow.style.zIndex = this.zIndex++;
         
-        // 设置初始位置和大小
         draggableWindow.style.left = '100px';
         draggableWindow.style.top = '100px';
         draggableWindow.style.width = '1024px';
@@ -78,6 +78,24 @@ const WindowManager = {
         closeButton.textContent = 'X';
         closeButton.onclick = () => this.close(windowId);
         windowHeader.appendChild(closeButton);
+
+        const windowControls = document.createElement('div');
+        windowControls.className = 'window-controls';
+        
+        const minimizeButton = document.createElement('button');
+        minimizeButton.className = 'window-control-button';
+        minimizeButton.innerHTML = '&minus;';
+        minimizeButton.onclick = () => this.minimize(windowId);
+        
+        const maximizeButton = document.createElement('button');
+        maximizeButton.className = 'window-control-button';
+        maximizeButton.innerHTML = '□';
+        maximizeButton.onclick = () => this.toggleMaximize(windowId);
+        
+        windowControls.appendChild(minimizeButton);
+        windowControls.appendChild(maximizeButton);
+        windowControls.appendChild(closeButton);
+        windowHeader.appendChild(windowControls);
         
         const iframe = document.createElement('iframe');
         iframe.src = src;
@@ -107,7 +125,10 @@ const WindowManager = {
         this.windows[windowId] = {
             element: draggableWindow,
             isDragging: false,
-            isResizing: false
+            isResizing: false,
+            isMaximized: false, // ✅ 初始化最大化状态
+            prevSize: {}, // ✅ 初始化之前的大小
+            prevPosition: {} // ✅ 初始化之前的位置
         };
         
         this.setupDrag(windowId, windowHeader);
@@ -117,15 +138,97 @@ const WindowManager = {
             this.bringToFront(windowId);
         });
         
-        // 移除动画类
         setTimeout(() => {
             draggableWindow.classList.remove('window-open-animation');
         }, 200);
         
+        this.addToTaskbar(windowId, title, appConfig.find(app => app.src === src)?.icon);
+
         return windowId;
+    },
+
+    addToTaskbar: function(windowId, title, icon) {
+        if (this.taskbarItems[windowId]) {
+            const btn = this.taskbarItems[windowId];
+            btn.title = title;
+            return;
+        }
+
+        const taskbar = document.getElementById('taskbar');
+        const taskbarItem = document.createElement('button');
+        taskbarItem.className = 'taskbar-btn running-app';
+        taskbarItem.dataset.windowId = windowId;
+        taskbarItem.title = title;
+        
+        if (icon && icon.startsWith('fas')) {
+            const iconEl = document.createElement('i');
+            iconEl.className = icon;
+            taskbarItem.appendChild(iconEl);
+        } else {
+            taskbarItem.style.backgroundImage = `url(${icon || '../icon/default-icon.png'})`;
+        }
+        
+        taskbarItem.addEventListener('click', () => {
+            this.toggleWindow(windowId);
+        });
+        
+        taskbar.appendChild(taskbarItem);
+        this.taskbarItems[windowId] = taskbarItem;
+    },
+
+    minimize: function(windowId) {
+        const window = this.windows[windowId];
+        if (window) {
+            window.element.style.display = 'none';
+            if (this.taskbarItems[windowId]) {
+                this.taskbarItems[windowId].classList.remove('active');
+            }
+        }
+    },
+
+    toggleMaximize: function(windowId) {
+        const window = this.windows[windowId];
+        if (window) {
+            if (window.isMaximized) {
+                window.element.style.width = window.prevSize.width;
+                window.element.style.height = window.prevSize.height;
+                window.element.style.left = window.prevPosition.left;
+                window.element.style.top = window.prevPosition.top;
+            } else {
+                window.prevSize = {
+                    width: window.element.style.width,
+                    height: window.element.style.height
+                };
+                window.prevPosition = {
+                    left: window.element.style.left,
+                    top: window.element.style.top
+                };
+                window.element.style.width = '100%';
+                window.element.style.height = 'calc(100% - 50px)';
+                window.element.style.left = '0';
+                window.element.style.top = '0';
+            }
+            window.isMaximized = !window.isMaximized;
+        }
+    },
+    
+    toggleWindow: function(windowId) {
+        const window = this.windows[windowId];
+        if (window) {
+            if (window.element.style.display === 'none') {
+                window.element.style.display = 'block';
+                this.bringToFront(windowId);
+            } else {
+                this.minimize(windowId);
+            }
+        }
     },
     
     close: function(windowId) {
+        if (this.taskbarItems[windowId]) {
+            this.taskbarItems[windowId].remove();
+            delete this.taskbarItems[windowId];
+        }
         if (this.windows[windowId]) {
             this.windows[windowId].element.remove();
             delete this.windows[windowId];
@@ -134,6 +237,14 @@ const WindowManager = {
     
     bringToFront: function(windowId) {
         if (this.windows[windowId]) {
+            Object.values(this.taskbarItems).forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (this.taskbarItems[windowId]) {
+                this.taskbarItems[windowId].classList.add('active');
+            }
+            
             this.windows[windowId].element.style.zIndex = this.zIndex++;
         }
     },
@@ -143,6 +254,7 @@ const WindowManager = {
         if (!windowObj) return;
         
         let offsetX, offsetY;
+        let moveHandler; // ✅ 提前声明
         
         headerElement.addEventListener('mousedown', (e) => {
             e.stopPropagation();
@@ -152,16 +264,24 @@ const WindowManager = {
             this.bringToFront(windowId);
         });
         
-        document.addEventListener('mousemove', (e) => {
+        moveHandler = (e) => {
             if (windowObj.isDragging) {
-                windowObj.element.style.left = `${e.clientX - offsetX}px`;
-                windowObj.element.style.top = `${e.clientY - offsetY}px`;
+                requestAnimationFrame(() => {
+                    windowObj.element.style.left = `${e.clientX - offsetX}px`;
+                    windowObj.element.style.top = `${e.clientY - offsetY}px`;
+                });
             }
-        });
+        };
+        
+        document.addEventListener('mousemove', moveHandler);
         
         document.addEventListener('mouseup', () => {
             windowObj.isDragging = false;
         });
+        
+        windowObj.cleanupDrag = () => {
+            document.removeEventListener('mousemove', moveHandler);
+        };
     },
     
     setupResize: function(windowId, resizeHandle) {
@@ -199,45 +319,34 @@ function createWindow(src, title) {
     return WindowManager.create(src, title);
 }
 
-// 任务栏功能
+// 任务栏
 function createTaskbarButtons() {
     const taskbar = document.getElementById('taskbar');
     
-    appConfig.forEach(app => {
+    const startApp = appConfig.find(app => app.isStartMenu);
+    if (startApp) {
         const button = document.createElement('button');
         button.className = 'taskbar-btn';
-        if (app.customClass) button.classList.add(app.customClass);
+        if (startApp.customClass) button.classList.add(startApp.customClass);
         
-        // 设置图标
-        if (app.icon && app.icon.startsWith('fas')) {
+        if (startApp.icon && startApp.icon.startsWith('fas')) {
             const icon = document.createElement('i');
-            icon.className = app.icon;
+            icon.className = startApp.icon;
             button.appendChild(icon);
-        } else if (app.icon || app.bgImage) {
-            button.style.backgroundImage = `url(${app.bgImage || app.icon})`;
+        } else if (startApp.icon) {
+            button.style.backgroundImage = `url(${startApp.icon})`;
         }
         
-        button.title = app.title;
-        if (app.src) button.dataset.src = app.src;
-        button.dataset.appId = app.id;
-        
-        if (app.isStartMenu) {
-            button.addEventListener('click', toggleStartMenu);
-        } else {
-            button.addEventListener('click', () => createWindow(app.src, app.title));
-        }
-        
+        button.title = startApp.title;
+        button.addEventListener('click', toggleStartMenu);
         taskbar.appendChild(button);
-    });
+    }
 }
 
 // 开始菜单功能
 async function getInstalledApps() {
     try {
-       
         const apps = [];
-        
-        // 合并系统应用
         return [
             ...appConfig
                 .filter(app => !app.isStartMenu && app.src)
@@ -254,7 +363,6 @@ async function getInstalledApps() {
         ];
     } catch (error) {
         console.error('获取应用列表失败:', error);
-        // 返回默认应用作为回退
         return appConfig
             .filter(app => !app.isStartMenu && app.src)
             .map(app => ({
@@ -342,14 +450,14 @@ function toggleStartMenu() {
     } else {
         startMenu.style.display = 'block';
         startMenu.style.animation = 'menuSlideUp 0.3s ease-out forwards';
+        startMenu.style.zIndex = '2000';
         populateAppList();
     }
 }
 
-// 全局事件监听
 document.addEventListener('click', (e) => {
     const startMenu = document.getElementById('startMenu');
-    const startButton = document.querySelector('.taskbar-btn[data-app-id="start"]');
+    const startButton = document.querySelector('.taskbar-btn.start');
     
     if (startMenu.style.display === 'block' && 
         !startMenu.contains(e.target) && 
@@ -358,16 +466,13 @@ document.addEventListener('click', (e) => {
         toggleStartMenu();
     }
 });
-// -----------
 
 // 主题颜色管理
 const ThemeManager = {
     init: function() {
-        
         const savedColor = localStorage.getItem('themeColor') || '#ff0000';
         this.applyTheme(savedColor);
         
-        // 监听来自设置页面的主题更改消息
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'themeChange') {
                 this.applyTheme(event.data.color);
@@ -379,7 +484,6 @@ const ThemeManager = {
         const rgb = this.hexToRgb(color);
         const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
         
-        // 更新CSS变量
         document.documentElement.style.setProperty('--theme-color', color);
         document.documentElement.style.setProperty('--theme-rgba', rgba);
         
@@ -391,7 +495,6 @@ const ThemeManager = {
             header.style.background = `linear-gradient(to right, ${color}, ${rgba})`;
         });
         
-        // 保存到本地存储
         localStorage.setItem('themeColor', color);
     },
     
@@ -405,10 +508,8 @@ const ThemeManager = {
     }
 };
 
-// 在window.onload中初始化主题
 ThemeManager.init();
 
-// 页面初始化
 window.onload = function() {
     createTaskbarButtons();
 };
